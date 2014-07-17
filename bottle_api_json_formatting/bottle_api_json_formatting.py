@@ -45,13 +45,14 @@ class JsonFormatting(object):
         }
 
     def __init__(self, supported_types=['*/*'], 
-            debug=False):
+            debug=False, json_default_encoder=None):
         self.debug = debug
         self.app = None
         self.function_type = None
         self.function_original = None
         self.supported_types = supported_types
         self.ALL_TYPES = JsonFormatting.ALL_TYPES
+        self.json_default_encoder = json_default_encoder
 
     def setup(self, app):
         ''' Handle plugin install '''
@@ -72,7 +73,8 @@ class JsonFormatting(object):
             if self.in_supported_types(request.headers.get('Accept', '')):
                 response_object = self.get_response_object(0)
                 response_object['data'] = output
-                json_response = json_dumps(response_object)
+                json_response = json_dumps(response_object,
+                                           default=self.json_default_encoder)
                 response.content_type = 'application/json'
                 return json_response
             else:
